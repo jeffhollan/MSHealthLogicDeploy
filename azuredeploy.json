@@ -77,7 +77,7 @@
   },
   "variables": {
     "$msHealthPackageID": "MSHealthAPI",
-	"$pbiPackageID": "PowerBIAPI",
+	  "$pbiPackageID": "PowerBIAPI",
     "$nugetFeed": "http://apiapps-preview.nuget.org/api/v2/"
   },
   "resources": [
@@ -288,8 +288,6 @@
         "dependencies": []
       }
     },
-	//Here is where the power BI API goes
-	
     {
       "type": "Microsoft.Web/sites",
       "apiVersion": "2015-04-01",
@@ -393,7 +391,6 @@
         "dependencies": []
       }
     },
-	//Here is where the workflow starts
     {
       "type": "Microsoft.Logic/workflows",
       "apiVersion": "2015-02-01-preview",
