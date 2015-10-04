@@ -59,26 +59,16 @@
       "metadata": {
         "description": "The instance size of the app."
       }
-    },
-    "gatewayToMSHApiAppSecret": {
-      "defaultValue": "TVNIZWFsdGhBUElDb25uZWN0b3I=",
-      "type": "securestring",
-      "metadata": {
-        "description": "The secret for the API app."
-      }
-    },
-	"gatewayToPBIApiAppSecret": {
-      "defaultValue": "UG93ZXJCSUFQSUNvbm5lY3Rvcg==",
-      "type": "securestring",
-      "metadata": {
-        "description": "The secret for the API app."
-      }
     }
+   
   },
   "variables": {
     "$msHealthPackageID": "MSHealthAPI",
 	  "$pbiPackageID": "PowerBIAPI",
-    "$nugetFeed": "http://apiapps-preview.nuget.org/api/v2/"
+    "$nugetFeed": "http://apiapps-preview.nuget.org/api/v2/",
+    "$gatewayToMSHApiAppSecret":  "TVNIZWFsdGhBUElDb25uZWN0b3I=",
+	  "$gatewayToPBIApiAppSecret": "UG93ZXJCSUFQSUNvbm5lY3Rvcg=="
+
   },
   "resources": [
     {
@@ -237,7 +227,7 @@
             },
             {
               "name": "EMA_Secret",
-              "value": "[parameters('gatewayToMSHAPIappSecret')]"
+              "value": "[parameters('$gatewayToMSHAPIappSecret')]"
             },
             {
               "name": "EMA_RuntimeUrl",
@@ -273,7 +263,7 @@
         }
       ],
       "dependsOn": [
-        "[resourceId('Microsoft.Web/sites/siteextensions', parameters('MSHealthAPIApp'), 'Microsoft.ApiApp')]"
+        "[resourceId('Microsoft.Web/sites/siteextensions', parameters('MSHealthAPIApp'), '[variables('$pbiPackageID')]')]"
       ],
       "properties": {
         "package": {
@@ -340,7 +330,7 @@
             },
             {
               "name": "EMA_Secret",
-              "value": "[parameters('gatewayToPBIAPIappSecret')]"
+              "value": "[parameters('$gatewayToPBIAPIappSecret')]"
             },
             {
               "name": "EMA_RuntimeUrl",
@@ -376,7 +366,7 @@
         }
       ],
       "dependsOn": [
-        "[resourceId('Microsoft.Web/sites/siteextensions', parameters('PowerBIAPIApp'), 'Microsoft.ApiApp')]"
+        "[resourceId('Microsoft.Web/sites/siteextensions', parameters('PowerBIAPIApp'), '[variables('$pbiPackageID')]')]"
       ],
       "properties": {
         "package": {
