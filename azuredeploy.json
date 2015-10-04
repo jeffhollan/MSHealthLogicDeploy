@@ -194,7 +194,7 @@
             "displayName": "APIAppExtension"
           },
           "apiVersion": "2015-04-01",
-          "name": "[variables('$msHealthPackageID')]",
+          "name": "Microsoft.ApiApp",
           "dependsOn": [
             "[resourceId('Microsoft.Web/sites', parameters('MSHealthAPIApp'))]"
           ],
@@ -227,7 +227,7 @@
             },
             {
               "name": "EMA_Secret",
-              "value": "[parameters('$gatewayToMSHAPIappSecret')]"
+              "value": "[variables('$gatewayToMSHAPIappSecret')]"
             },
             {
               "name": "EMA_RuntimeUrl",
@@ -263,7 +263,7 @@
         }
       ],
       "dependsOn": [
-        "[resourceId('Microsoft.Web/sites/siteextensions', parameters('MSHealthAPIApp'), '[variables('$pbiPackageID')]')]"
+        "[resourceId('Microsoft.Web/sites/siteextensions', parameters('MSHealthAPIApp'), 'Microsoft.ApiApp')]"
       ],
       "properties": {
         "package": {
@@ -297,7 +297,7 @@
             "displayName": "APIAppExtension"
           },
           "apiVersion": "2015-04-01",
-          "name": "[variables('$pbiPackageID')]",
+          "name": "Microsoft.ApiApp",
           "dependsOn": [
             "[resourceId('Microsoft.Web/sites', parameters('PowerBIAPIApp'))]"
           ],
@@ -330,7 +330,7 @@
             },
             {
               "name": "EMA_Secret",
-              "value": "[parameters('$gatewayToPBIAPIappSecret')]"
+              "value": "[variables('$gatewayToPBIAPIappSecret')]"
             },
             {
               "name": "EMA_RuntimeUrl",
@@ -366,7 +366,7 @@
         }
       ],
       "dependsOn": [
-        "[resourceId('Microsoft.Web/sites/siteextensions', parameters('PowerBIAPIApp'), '[variables('$pbiPackageID')]')]"
+        "[resourceId('Microsoft.Web/sites/siteextensions', parameters('PowerBIAPIApp'), 'Microsoft.ApiApp')]"
       ],
       "properties": {
         "package": {
