@@ -11,7 +11,7 @@
     },
 	"TwitterAPIApp": {
       	"type": "string",
-	"defaultValue": "TwitterConnector",
+	"defaultValue": "Twitter_Unique_Name",
       "metadata": {
         "description": "The name of the Power BI API app.  Must be unique."
       }
@@ -344,12 +344,12 @@
           "apiVersion": "2015-01-01",
           "name": "Microsoft.Resources/apiApp",
           "dependsOn": [
-            "[resourceId('Microsoft.Web/sites', parameters('PowerBIAPIApp'))]"
+            "[resourceId('Microsoft.Web/sites', parameters('TwitterAPIApp'))]"
           ],
           "properties": {
-            "targetId": "[resourceId('Microsoft.AppService/apiapps', parameters('PowerBIAPIApp'))]"
+            "targetId": "[resourceId('Microsoft.AppService/apiapps', parameters('TwitterAPIApp'))]"
           }
-        },
+        }
         
       ],
       "properties": {
@@ -400,7 +400,7 @@
         }
       ],
       "dependsOn": [
-        "[resourceId('Microsoft.Web/sites/siteextensions', parameters('TwitterAPIApp'), 'Microsoft.ApiApp')]"
+        "[resourceId('Microsoft.Web/sites/siteextensions', parameters('TwitterAPIApp'), 'TwitterConnector')]"
       ],
       "properties": {
         "package": {
@@ -458,7 +458,7 @@
                   "id": "[concat(resourceGroup().id, '/providers/Microsoft.AppService/apiApps/',parameters('MSHealthAPIApp'))]",
                   "gateway": "[concat('https://', reference(resourceId('Microsoft.Web/sites', parameters('gatewayName'))).hostNames[0])]"
                 },
-                "operation": "TriggerOnDeviceSync",
+                "operation": "TriggerOnActivity",
                 "parameters": {
                   "triggerState": "@coalesce(triggers()?.outputs?.body?['triggerState'],'')"
                 },
@@ -470,13 +470,159 @@
               },
               "recurrence": {
                 "frequency": "Minute",
-                "interval": 15
+                "interval": 1
               },
               "conditions": []
             }
           },
           "actions": {
+            "twitterrun": {
+              "type": "ApiApp",
+              "inputs": {
+                "apiVersion": "2015-01-14",
+                "host": {
+                  "id": "[concat(resourceGroup().id, '/providers/Microsoft.AppService/apiApps/',parameters('TwitterAPIApp'))]",
+                  "gateway": "[concat('https://', reference(resourceId('Microsoft.Web/sites', parameters('gatewayName'))).hostNames[0])]"
+                },
+                "operation": "PostTweet",
+                "parameters": {
+                  "TweetText": "I just finished a run with my Band and went @{div(first(triggers().outputs.body.runActivities).actualDistance, 160934.4)} miles in @{first(triggers().outputs.body.runActivities).duration} minutes!"
+                },
+                "authentication": {
+                  "type": "Raw",
+                  "scheme": "Zumo",
+                  "parameter": "@parameters('token')"
+                }
+              },
+              "conditions": [
+                {
+                  "expression": "@not(empty(triggers().outputs.body.runActivities))"
+                }
+              ]
+            },
+            "twitterbike": {
+              "type": "ApiApp",
+              "inputs": {
+                "apiVersion": "2015-01-14",
+                "host": {
+                  "id": "[concat(resourceGroup().id, '/providers/Microsoft.AppService/apiApps/',parameters('TwitterAPIApp'))]",
+                  "gateway": "[concat('https://', reference(resourceId('Microsoft.Web/sites', parameters('gatewayName'))).hostNames[0])]"
+                },
+                "operation": "PostTweet",
+                "parameters": {
+                  "TweetText": "I just finished biking with my Band and went @{div(first(triggers().outputs.body.bikeActivities).actualDistance, 160934.4)} miles in @{first(triggers().outputs.body.bikeActivities).duration} minutes!"
+                },
+                "authentication": {
+                  "type": "Raw",
+                  "scheme": "Zumo",
+                  "parameter": "@parameters('token')"
+                }
+              },
+              "conditions": [
+                {
+                  "expression": "@not(empty(triggers().outputs.body.bikeActivities))"
+                }
+              ]
+            },
+            "twitterfree": {
+              "type": "ApiApp",
+              "inputs": {
+                "apiVersion": "2015-01-14",
+                "host": {
+                  "id": "[concat(resourceGroup().id, '/providers/Microsoft.AppService/apiApps/',parameters('TwitterAPIApp'))]",
+                  "gateway": "[concat('https://', reference(resourceId('Microsoft.Web/sites', parameters('gatewayName'))).hostNames[0])]"
+                },
+                "operation": "PostTweet",
+                "parameters": {
+                  "TweetText": "I just finished a workout with my Band and burned @{first(triggers().outputs.body.freePlayActivities).totalCalories} calories in @{first(triggers().outputs.body.freePlayActivities).duration} minutes!"
+                },
+                "authentication": {
+                  "type": "Raw",
+                  "scheme": "Zumo",
+                  "parameter": "@parameters('token')"
+                }
+              },
+              "conditions": [
+                {
+                  "expression": "@not(empty(triggers().outputs.body.freePlayActivities))"
+                }
+              ]
+            },
+            "twitterguided": {
+              "type": "ApiApp",
+              "inputs": {
+                "apiVersion": "2015-01-14",
+                "host": {
+                  "id": "[concat(resourceGroup().id, '/providers/Microsoft.AppService/apiApps/',parameters('TwitterAPIApp'))]",
+                  "gateway": "[concat('https://', reference(resourceId('Microsoft.Web/sites', parameters('gatewayName'))).hostNames[0])]"
+                },
+                "operation": "PostTweet",
+                "parameters": {
+                  "TweetText": "I just finished a workout with my Band and burned @{first(triggers().outputs.body.guidedWorkoutActivities).totalCalories} calories in @{first(triggers().outputs.body.guidedWorkoutActivities).duration} minutes!"
+                },
+                "authentication": {
+                  "type": "Raw",
+                  "scheme": "Zumo",
+                  "parameter": "@parameters('token')"
+                }
+              },
+              "conditions": [
+                {
+                  "expression": "@not(empty(triggers().outputs.body.guidedWorkoutActivities))"
+                }
+              ]
+            },
+            "twittergolf": {
+              "type": "ApiApp",
+              "inputs": {
+                "apiVersion": "2015-01-14",
+                "host": {
+                  "id": "[concat(resourceGroup().id, '/providers/Microsoft.AppService/apiApps/',parameters('TwitterAPIApp'))]",
+                  "gateway": "[concat('https://', reference(resourceId('Microsoft.Web/sites', parameters('gatewayName'))).hostNames[0])]"
+                },
+                "operation": "PostTweet",
+                "parameters": {
+                  "TweetText": "I just went golfing with my Band and took @{first(triggers().outputs.body.golfActivities).totalStepCount} steps and had a drive of @{div(first(triggers().outputs.body.golfActivities).longestDriveDistance, 91.44)} yards!"
+                },
+                "authentication": {
+                  "type": "Raw",
+                  "scheme": "Zumo",
+                  "parameter": "@parameters('token')"
+                }
+              },
+              "conditions": [
+                {
+                  "expression": "@not(empty(triggers().outputs.body.golfActivities))"
+                }
+              ]
+            },
+            "twittersleep": {
+              "type": "ApiApp",
+              "inputs": {
+                "apiVersion": "2015-01-14",
+                "host": {
+                  "id": "[concat(resourceGroup().id, '/providers/Microsoft.AppService/apiApps/',parameters('TwitterAPIApp'))]",
+                  "gateway": "[concat('https://', reference(resourceId('Microsoft.Web/sites', parameters('gatewayName'))).hostNames[0])]"
+                },
+                "operation": "PostTweet",
+                "parameters": {
+                  "TweetText": "Just woke up - Band registered @{first(triggers().outputs.body.sleepActivites).sleepDuration} minutes of sleep with @{first(triggers().outputs.body.sleepActivites).sleepEfficiencyPercentage} efficiency."
+                },
+                "authentication": {
+                  "type": "Raw",
+                  "scheme": "Zumo",
+                  "parameter": "@parameters('token')"
+                }
+              },
+              "conditions": [
+                {
+                  "expression": "@not(empty(triggers().outputs.body.sleepActivites))"
+                }
+              ]
+            }
+            
           },
+          
           "outputs": {}
         },
         
