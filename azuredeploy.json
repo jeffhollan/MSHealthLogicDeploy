@@ -22,13 +22,7 @@
         "description": "The name of the gateway. Must be unique."
       }
     },
-    "logicAppName": {
-      "type": "string",
-	  "defaultValue": "MicrosoftHealthLogicApp",
-      "metadata": {
-        "description": "The name of the logic app to create."
-      }
-    },
+    
     "MSClientID": {
       "type": "string",
       "metadata": {
@@ -97,8 +91,8 @@
 	  "$pbiPackageID": "PowerBIAPI",
     "$nugetFeed": "http://apiapps-preview.nuget.org/api/v2/",
     "$gatewayToMSHApiAppSecret":  "TVNIZWFsdGhBUElDb25uZWN0b3I=",
-	  "$gatewayToPBIApiAppSecret": "UG93ZXJCSUFQSUNvbm5lY3Rvcg=="
-
+	  "$gatewayToPBIApiAppSecret": "UG93ZXJCSUFQSUNvbm5lY3Rvcg==",
+    "$pbiLogicAppName": "BandToPowerBI"
   },
   "resources": [
     {
@@ -187,7 +181,7 @@
           "type": "tokens",
           "apiVersion": "2015-03-01-preview",
           "location": "[resourceGroup().location]",
-          "name": "[parameters('logicAppName')]",
+          "name": "[variables('$pbiLogicAppName')]",
           "tags": {
             "displayName": "AuthenticationToken"
           },
@@ -465,16 +459,14 @@
     {
       "type": "Microsoft.Logic/workflows",
       "apiVersion": "2015-02-01-preview",
-      "name": "[parameters('logicAppName')]",
+      "name": "[variables('$pbiLogicAppName')]",
       "location": "[resourceGroup().location]",
       "tags": {
         "displayName": "LogicApp"
       },
       "dependsOn": [
         "[resourceId('Microsoft.AppService/apiApps', parameters('MSHealthAPIApp'))]",
-		    "[resourceId('Microsoft.AppService/apiApps', parameters('PowerBIAPIApp'))]",
-        "[resourceId('Microsoft.Web/sites/sourcecontrols', parameters('MSHealthAPIApp'), 'web')]",
-        "[resourceId('Microsoft.Web/sites/sourcecontrols', parameters('PowerBIAPIApp'), 'web')]"
+		    "[resourceId('Microsoft.AppService/apiApps', parameters('PowerBIAPIApp'))]"
       ],
       "properties": {
         "state": "Disabled",
@@ -489,7 +481,7 @@
           "contentVersion": "1.0.0.0",
           "parameters": {
             "token": {
-              "defaultValue": "[reference(resourceId('Microsoft.AppService/gateways/tokens', parameters('gatewayName'), parameters('logicAppName'))).token]",
+              "defaultValue": "[reference(resourceId('Microsoft.AppService/gateways/tokens', parameters('gatewayName'), variables('$pbiLogicAppName'))).token]",
               "type": "String",
               "metadata": {
                 "token": {
