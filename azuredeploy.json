@@ -4,27 +4,51 @@
   "parameters": {
     "MSHealthAPIApp": {
       "type": "string",
-	  "defaultValue": "MSHealthAPI",
+	  "defaultValue": "MSHealth_Unique_Name",
       "metadata": {
-        "description": "The name of the MSHealth API app."
+        "description": "The name of the MSHealth API app. Must be unique."
       }
     },
 	"PowerBIAPIApp": {
       "type": "string",
-	  "defaultValue": "PowerBIAPI",
+	  "defaultValue": "PowerBI_Unique_Name",
       "metadata": {
-        "description": "The name of the Power BI API app."
+        "description": "The name of the Power BI API app.  Must be unique."
       }
     },
     "gatewayName": {
       "type": "string",
       "metadata": {
-        "description": "The name of the gateway."
+        "description": "The name of the gateway. Must be unique."
       }
     },
     "logicAppName": {
       "type": "string",
 	  "defaultValue": "MicrosoftHealthLogicApp",
+      "metadata": {
+        "description": "The name of the logic app to create."
+      }
+    },
+    "MSClientID": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the logic app to create."
+      }
+    },
+    "MSClientSecret": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the logic app to create."
+      }
+    },
+    "aadClientID": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the logic app to create."
+      }
+    },
+    "aadClientSecret": {
+      "type": "string",
       "metadata": {
         "description": "The name of the logic app to create."
       }
@@ -256,11 +280,11 @@
             }
             ,
             { "name": "clientId",
-              "value": "4561" 
+              "value": "[parameters('MSClientID')]" 
             }
             ,
             { "name": "clientSecret",
-              "value": "5616" 
+              "value": "[parameters('MSClientSecret')]" 
             }
           ]
         }
@@ -383,11 +407,11 @@
             }
             ,
             { "name": "clientId",
-              "value": "4561" 
+              "value": "[parameters('aadClientID')]" 
             }
             ,
             { "name": "clientSecret",
-              "value": "5616" 
+              "value": "[parameters('aadClientSecret')]" 
             }
           ]
         }
