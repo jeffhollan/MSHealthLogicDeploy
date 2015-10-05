@@ -32,25 +32,31 @@
     "MSClientID": {
       "type": "string",
       "metadata": {
-        "description": "The name of the logic app to create."
+        "description": "Microsoft Account App Client ID"
       }
     },
     "MSClientSecret": {
       "type": "string",
       "metadata": {
-        "description": "The name of the logic app to create."
+        "description": "Microsoft Account App Client Secret"
       }
     },
     "aadClientID": {
       "type": "string",
       "metadata": {
-        "description": "The name of the logic app to create."
+        "description": "AAD Client ID"
       }
     },
     "aadClientSecret": {
       "type": "string",
       "metadata": {
-        "description": "The name of the logic app to create."
+        "description": "AAD Client Secret"
+      }
+    },
+    "datasetId": {
+      "type": "string",
+      "metadata": {
+        "description": "Dataset ID for the Power BI Dataset"
       }
     },
     "svcPlanName": {
@@ -318,6 +324,7 @@
         "package": {
           "id": "Microsoft.ApiApp"
         },
+        "accessLevel" : "PublicAnonymous",
         "host": {
           "resourceName": "[parameters('MSHealthAPIApp')]"
         },
@@ -445,6 +452,7 @@
         "package": {
           "id": "Microsoft.ApiApp"
         },
+        "accessLevel" : "PublicAnonymous",
         "host": {
           "resourceName": "[parameters('PowerBIAPIApp')]"
         },
@@ -480,8 +488,7 @@
           "$schema": "http://schema.management.azure.com/providers/Microsoft.Logic/schemas/2014-12-01-preview/workflowdefinition.json#",
           "contentVersion": "1.0.0.0",
           "parameters": {
-            
-		        "token": {
+            "token": {
               "defaultValue": "[reference(resourceId('Microsoft.AppService/gateways/tokens', parameters('gatewayName'), parameters('logicAppName'))).token]",
               "type": "String",
               "metadata": {
@@ -492,36 +499,58 @@
             }
           },
           "triggers": {
-                  "MSHealthAPI": {
-                  "type": "ApiApp",
-                  "inputs": {
-                      "apiVersion": "2015-01-14",
-                      "host": {
-                          "id": "[concat(resourceGroup().id, '/providers/Microsoft.AppService/apiApps/',parameters('MSHealthAPIApp'))]",
-                          "gateway": "[concat('https://', reference(resourceId('Microsoft.Web/sites', parameters('gatewayName'))).hostNames[0])]"
-                      },
-                      "operation": "GetHourlySummary",
-                      "parameters": {
-                          "triggerState": "@coalesce(triggers()?.outputs?.body?['triggerState'],'')"
-                      },
-                      "authentication": {
-                          "type": "Raw",
-                          "scheme": "Zumo",
-                          "parameter": "@parameters('token')"
-                      }
-                  },
-                  "recurrence": {
-                      "frequency": "Minute",
-                      "interval": 15
-                  },
-                  "conditions": []
-              }
+            "MSHealthAPI": {
+              "type": "ApiApp",
+              "inputs": {
+                "apiVersion": "2015-01-14",
+                "host": {
+                  "id": "[concat(resourceGroup().id, '/providers/Microsoft.AppService/apiApps/',parameters('MSHealthAPIApp'))]",
+                  "gateway": "[concat('https://', reference(resourceId('Microsoft.Web/sites', parameters('gatewayName'))).hostNames[0])]"
                 },
-          "actions": {
+                "operation": "TriggerOnDeviceSync",
+                "parameters": {
+                  "triggerState": "@coalesce(triggers()?.outputs?.body?['triggerState'],'')"
+                },
+                "authentication": {
+                  "type": "Raw",
+                  "scheme": "Zumo",
+                  "parameter": "@parameters('token')"
+                }
+              },
+              "recurrence": {
+                "frequency": "Minute",
+                "interval": 15
+              },
+              "conditions": []
+            }
           },
-          "outputs": {
-          }
+          "actions": {
+            "powerbiapi": {
+              "type": "ApiApp",
+              "inputs": {
+                "apiVersion": "2015-01-14",
+                "host": {
+                  "id": "[concat(resourceGroup().id, '/providers/Microsoft.AppService/apiApps/',parameters('PowerBIAPIApp'))]",
+                  "gateway": "[concat('https://', reference(resourceId('Microsoft.Web/sites', parameters('gatewayName'))).hostNames[0])]"
+                },
+                "operation": "AddRows(String)",
+                "parameters": {
+                  "datasetId": "[parameters('datasetId')]",
+                  "table": "Summary",
+                  "rows": "@string(triggers().outputs.body.rows)"
+                },
+                "authentication": {
+                  "type": "Raw",
+                  "scheme": "Zumo",
+                  "parameter": "@parameters('token')"
+                }
+              },
+              "conditions": []
+            }
+          },
+          "outputs": {}
         },
+        
         "parameters": {}
       }
     }
