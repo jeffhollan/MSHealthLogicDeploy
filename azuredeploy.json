@@ -441,10 +441,11 @@
       "dependsOn": [
         "[resourceId('Microsoft.AppService/apiApps', parameters('MSHealthAPIApp'))]",
 		    "[resourceId('Microsoft.AppService/apiApps', parameters('PowerBIAPIApp'))]",
-        "[resourceId('Microsoft.Web/sites/sourcecontrols', parameters('MSHealthAPIApp'), 'web')]"
-		
+        "[resourceId('Microsoft.Web/sites/sourcecontrols', parameters('MSHealthAPIApp'), 'web')]",
+        "[resourceId('Microsoft.Web/sites/sourcecontrols', parameters('PowerBIAPIApp'), 'web')]"
       ],
       "properties": {
+        "state": "Disabled",
         "sku": {
           "name": "[parameters('sku')]",
           "plan": {
@@ -455,9 +456,43 @@
           "$schema": "http://schema.management.azure.com/providers/Microsoft.Logic/schemas/2014-12-01-preview/workflowdefinition.json#",
           "contentVersion": "1.0.0.0",
           "parameters": {
+            
+		        "token": {
+              "defaultValue": "[reference(resourceId('Microsoft.AppService/gateways/tokens', parameters('gatewayName'), parameters('logicAppName'))).token]",
+              "type": "String",
+              "metadata": {
+                "token": {
+                  "name": "token"
+                }
+              }
+            }
           },
           "triggers": {
-          },
+                  "MSHealthAPI": {
+                  "type": "ApiApp",
+                  "inputs": {
+                      "apiVersion": "2015-01-14",
+                      "host": {
+                          "id": "[concat(resourceGroup().id, '/providers/Microsoft.AppService/apiApps/',parameters('MSHealthAPIApp'))]",
+                          "gateway": "[concat('https://', reference(resourceId('Microsoft.Web/sites', parameters('gatewayName'))).hostNames[0])]"
+                      },
+                      "operation": "GetHourlySummary",
+                      "parameters": {
+                          "triggerState": "@coalesce(triggers()?.outputs?.body?['triggerState'],'')"
+                      },
+                      "authentication": {
+                          "type": "Raw",
+                          "scheme": "Zumo",
+                          "parameter": "@parameters('token')"
+                      }
+                  },
+                  "recurrence": {
+                      "frequency": "Minute",
+                      "interval": 15
+                  },
+                  "conditions": []
+              }
+                },
           "actions": {
           },
           "outputs": {
