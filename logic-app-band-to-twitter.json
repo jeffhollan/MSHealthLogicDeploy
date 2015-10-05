@@ -9,9 +9,9 @@
         "description": "The name of the MSHealth API app. Must be unique."
       }
     },
-	"PowerBIAPIApp": {
-      "type": "string",
-	  "defaultValue": "PowerBI_Unique_Name",
+	"TwitterAPIApp": {
+      	"type": "string",
+	"defaultValue": "TwitterConnector",
       "metadata": {
         "description": "The name of the Power BI API app.  Must be unique."
       }
@@ -35,24 +35,7 @@
         "description": "Microsoft Account App Client Secret"
       }
     },
-    "aadClientID": {
-      "type": "string",
-      "metadata": {
-        "description": "AAD Client ID"
-      }
-    },
-    "aadClientSecret": {
-      "type": "string",
-      "metadata": {
-        "description": "AAD Client Secret"
-      }
-    },
-    "datasetId": {
-      "type": "string",
-      "metadata": {
-        "description": "Dataset ID for the Power BI Dataset"
-      }
-    },
+    
     "svcPlanName": {
       "type": "string",
       "metadata": {
@@ -88,12 +71,10 @@
   },
   "variables": {
     "$msHealthPackageID": "MSHealthAPI",
-	  "$pbiPackageID": "PowerBIAPI",
     "$nugetFeed": "http://apiapps-preview.nuget.org/api/v2/",
     "$gatewayToMSHApiAppSecret":  "TVNIZWFsdGhBUElDb25uZWN0b3I=",
-	  "$gatewayToPBIApiAppSecret": "UG93ZXJCSUFQSUNvbm5lY3Rvcg==",
-    "$pbiLogicAppName": "BandSummary",
-    "$activityLogicAppName": "BandActivity"
+    "$gatewayToTwitterApiAppSecret": "VHdpdHRlckFQSUNvbm5lY3Rvcg==",
+    "$notifyLogicAppName": "BandActivityTwitter"
   },
   "resources": [
     {
@@ -182,19 +163,7 @@
           "type": "tokens",
           "apiVersion": "2015-03-01-preview",
           "location": "[resourceGroup().location]",
-          "name": "[variables('$pbiLogicAppName')]",
-          "tags": {
-            "displayName": "AuthenticationToken"
-          },
-          "dependsOn": [
-            "[resourceId('Microsoft.AppService/gateways', parameters('gatewayName'))]"
-          ]
-        },
-        {
-          "type": "tokens",
-          "apiVersion": "2015-03-01-preview",
-          "location": "[resourceGroup().location]",
-          "name": "[variables('$activityLogicAppName')]",
+          "name": "[variables('$notifyLogicAppName')]",
           "tags": {
             "displayName": "AuthenticationToken"
           },
@@ -344,11 +313,12 @@
     {
       "type": "Microsoft.Web/sites",
       "apiVersion": "2015-04-01",
-      "name": "[parameters('PowerBIAPIApp')]",
+      "name": "[parameters('TwitterAPIApp')]",
       "location": "[resourceGroup().location]",
       "kind": "apiApp",
       "tags": {
-        "displayName": "APIAppHost"
+        "displayName": "APIAppHost",
+        "packageId": "TwitterConnector"
       },
       "dependsOn": [
         "[resourceId('Microsoft.AppService/gateways', parameters('gatewayName'))]"
@@ -360,9 +330,9 @@
             "displayName": "APIAppExtension"
           },
           "apiVersion": "2015-04-01",
-          "name": "Microsoft.ApiApp",
+          "name": "TwitterConnector",
           "dependsOn": [
-            "[resourceId('Microsoft.Web/sites', parameters('PowerBIAPIApp'))]"
+            "[resourceId('Microsoft.Web/sites', parameters('TwitterAPIApp'))]"
           ],
           "properties": {
             "type": "WebRoot",
@@ -380,33 +350,21 @@
             "targetId": "[resourceId('Microsoft.AppService/apiapps', parameters('PowerBIAPIApp'))]"
           }
         },
-        {
-          "apiVersion": "2015-04-01",
-          "name": "web",
-          "type": "sourcecontrols",
-          "dependsOn": [
-            "[resourceId('Microsoft.Web/Sites', parameters('PowerBIAPIApp'))]"
-          ],
-          "properties": {
-            "RepoUrl": "https://github.com/jeffhollan/PowerBIAPI",
-            "branch": "master",
-            "IsManualIntegration": true
-          }
-        }
+        
       ],
       "properties": {
-        "name": "[parameters('PowerBIAPIApp')]",
+        "name": "[parameters('TwitterAPIApp')]",
         "gatewaySiteName": "[parameters('gatewayName')]",
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('svcPlanName'))]",
         "siteConfig": {
           "appSettings": [
             {
               "name": "EMA_MicroserviceId",
-              "value": "[parameters('PowerBIAPIApp')]"
+              "value": "[parameters('TwitterAPIApp')]"
             },
             {
               "name": "EMA_Secret",
-              "value": "[variables('$gatewayToPBIAPIappSecret')]"
+              "value": "[variables('$gatewayToTwitterAPIappSecret')]"
             },
             {
               "name": "EMA_RuntimeUrl",
@@ -415,17 +373,6 @@
             {
               "name": "WEBSITE_START_SCM_ON_SITE_CREATION",
               "value": "1"
-            },
-            { "name": "siteUrl",
-              "value": "[parameters('PowerBIAPIApp')]" 
-            }
-            ,
-            { "name": "clientId",
-              "value": "[parameters('aadClientID')]" 
-            }
-            ,
-            { "name": "clientSecret",
-              "value": "[parameters('aadClientSecret')]" 
             }
           ]
         }
@@ -434,7 +381,7 @@
     {
       "type": "Microsoft.AppService/apiapps",
       "apiVersion": "2015-03-01-preview",
-      "name": "[parameters('PowerBIAPIApp')]",
+      "name": "[parameters('TwitterAPIApp')]",
       "location": "[resourceGroup().location]",
       "tags": {
         "displayName": "APIApp"
@@ -445,23 +392,22 @@
           "apiVersion": "2015-01-01",
           "name": "Microsoft.Resources/apiAppSite",
           "dependsOn": [
-            "[resourceId('Microsoft.AppService/apiapps', parameters('PowerBIAPIApp'))]"
+            "[resourceId('Microsoft.AppService/apiapps', parameters('TwitterAPIApp'))]"
           ],
           "properties": {
-            "targetId": "[resourceId('Microsoft.Web/sites', parameters('PowerBIAPIApp'))]"
+            "targetId": "[resourceId('Microsoft.Web/sites', parameters('TwitterAPIApp'))]"
           }
         }
       ],
       "dependsOn": [
-        "[resourceId('Microsoft.Web/sites/siteextensions', parameters('PowerBIAPIApp'), 'Microsoft.ApiApp')]"
+        "[resourceId('Microsoft.Web/sites/siteextensions', parameters('TwitterAPIApp'), 'Microsoft.ApiApp')]"
       ],
       "properties": {
         "package": {
-          "id": "Microsoft.ApiApp"
+          "id": "TwitterConnector"
         },
-        "accessLevel" : "PublicAnonymous",
         "host": {
-          "resourceName": "[parameters('PowerBIAPIApp')]"
+          "resourceName": "[parameters('TwitterAPIApp')]"
         },
         "gateway": {
           "resourceName": "[parameters('gatewayName')]"
@@ -472,14 +418,14 @@
     {
       "type": "Microsoft.Logic/workflows",
       "apiVersion": "2015-02-01-preview",
-      "name": "[variables('$pbiLogicAppName')]",
+      "name": "[variables('$notifyLogicAppName')]",
       "location": "[resourceGroup().location]",
       "tags": {
         "displayName": "LogicApp"
       },
       "dependsOn": [
         "[resourceId('Microsoft.AppService/apiApps', parameters('MSHealthAPIApp'))]",
-		    "[resourceId('Microsoft.AppService/apiApps', parameters('PowerBIAPIApp'))]"
+		    "[resourceId('Microsoft.AppService/apiApps', parameters('TwitterAPIApp'))]"
       ],
       "properties": {
         "state": "Disabled",
@@ -494,7 +440,7 @@
           "contentVersion": "1.0.0.0",
           "parameters": {
             "token": {
-              "defaultValue": "[reference(resourceId('Microsoft.AppService/gateways/tokens', parameters('gatewayName'), variables('$pbiLogicAppName'))).token]",
+              "defaultValue": "[reference(resourceId('Microsoft.AppService/gateways/tokens', parameters('gatewayName'), variables('$notifyLogicAppName'))).token]",
               "type": "String",
               "metadata": {
                 "token": {
@@ -530,240 +476,6 @@
             }
           },
           "actions": {
-            "powerbiapi": {
-              "type": "ApiApp",
-              "inputs": {
-                "apiVersion": "2015-01-14",
-                "host": {
-                  "id": "[concat(resourceGroup().id, '/providers/Microsoft.AppService/apiApps/',parameters('PowerBIAPIApp'))]",
-                  "gateway": "[concat('https://', reference(resourceId('Microsoft.Web/sites', parameters('gatewayName'))).hostNames[0])]"
-                },
-                "operation": "AddRows(String)",
-                "parameters": {
-                  "datasetId": "[parameters('datasetId')]",
-                  "table": "Summary",
-                  "rows": "@string(triggers().outputs.body.rows)"
-                },
-                "authentication": {
-                  "type": "Raw",
-                  "scheme": "Zumo",
-                  "parameter": "@parameters('token')"
-                }
-              },
-              "conditions": []
-            }
-          },
-          "outputs": {}
-        },
-        
-        "parameters": {}
-      }
-    },
-    {
-      "type": "Microsoft.Logic/workflows",
-      "apiVersion": "2015-02-01-preview",
-      "name": "[variables('$activityLogicAppName')]",
-      "location": "[resourceGroup().location]",
-      "tags": {
-        "displayName": "LogicApp"
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.AppService/apiApps', parameters('MSHealthAPIApp'))]",
-		    "[resourceId('Microsoft.AppService/apiApps', parameters('PowerBIAPIApp'))]"
-      ],
-      "properties": {
-        "state": "Disabled",
-        "sku": {
-          "name": "[parameters('sku')]",
-          "plan": {
-            "id": "[concat(resourceGroup().id, '/providers/Microsoft.Web/serverfarms/',parameters('svcPlanName'))]"
-          }
-        },
-        "definition": {
-          "$schema": "http://schema.management.azure.com/providers/Microsoft.Logic/schemas/2014-12-01-preview/workflowdefinition.json#",
-          "contentVersion": "1.0.0.0",
-          "parameters": {
-            "token": {
-              "defaultValue": "[reference(resourceId('Microsoft.AppService/gateways/tokens', parameters('gatewayName'), variables('$activityLogicAppName'))).token]",
-              "type": "String",
-              "metadata": {
-                "token": {
-                  "name": "token"
-                }
-              }
-            }
-          },
-          "triggers": {
-            "MSHealthAPI": {
-              "type": "ApiApp",
-              "inputs": {
-                "apiVersion": "2015-01-14",
-                "host": {
-                  "id": "[concat(resourceGroup().id, '/providers/Microsoft.AppService/apiApps/',parameters('MSHealthAPIApp'))]",
-                  "gateway": "[concat('https://', reference(resourceId('Microsoft.Web/sites', parameters('gatewayName'))).hostNames[0])]"
-                },
-                "operation": "TriggerOnActivity",
-                "parameters": {
-                  "triggerState": "@coalesce(triggers()?.outputs?.body?['triggerState'],'')"
-                },
-                "authentication": {
-                  "type": "Raw",
-                  "scheme": "Zumo",
-                  "parameter": "@parameters('token')"
-                }
-              },
-              "recurrence": {
-                "frequency": "Minute",
-                "interval": 15
-              },
-              "conditions": []
-            }
-          },
-          "actions": {
-            "powerbirun": {
-              "type": "ApiApp",
-              "inputs": {
-                "apiVersion": "2015-01-14",
-                "host": {
-                  "id": "[concat(resourceGroup().id, '/providers/Microsoft.AppService/apiApps/',parameters('PowerBIAPIApp'))]",
-                  "gateway": "[concat('https://', reference(resourceId('Microsoft.Web/sites', parameters('gatewayName'))).hostNames[0])]"
-                },
-                "operation": "AddRows(String)",
-                "parameters": {
-                  "datasetId": "[parameters('datasetId')]",
-                  "table": "RunActivities",
-                  "rows": "@string(triggers().outputs.body.runActivities)"
-                },
-                "authentication": {
-                  "type": "Raw",
-                  "scheme": "Zumo",
-                  "parameter": "@parameters('token')"
-                }
-              },
-              "conditions": [  {
-                    "expression": "@not(empty(triggers().outputs.body.runActivities))"
-                }]
-            },
-            "powerbibike": {
-              "type": "ApiApp",
-              "inputs": {
-                "apiVersion": "2015-01-14",
-                "host": {
-                  "id": "[concat(resourceGroup().id, '/providers/Microsoft.AppService/apiApps/',parameters('PowerBIAPIApp'))]",
-                  "gateway": "[concat('https://', reference(resourceId('Microsoft.Web/sites', parameters('gatewayName'))).hostNames[0])]"
-                },
-                "operation": "AddRows(String)",
-                "parameters": {
-                  "datasetId": "[parameters('datasetId')]",
-                  "table": "BikeActivities",
-                  "rows": "@string(triggers().outputs.body.bikeActivities)"
-                },
-                "authentication": {
-                  "type": "Raw",
-                  "scheme": "Zumo",
-                  "parameter": "@parameters('token')"
-                }
-              },
-              "conditions": [  {
-                    "expression": "@not(empty(triggers().outputs.body.bikeActivities))"
-                }]
-            },
-            "powerbifree": {
-              "type": "ApiApp",
-              "inputs": {
-                "apiVersion": "2015-01-14",
-                "host": {
-                  "id": "[concat(resourceGroup().id, '/providers/Microsoft.AppService/apiApps/',parameters('PowerBIAPIApp'))]",
-                  "gateway": "[concat('https://', reference(resourceId('Microsoft.Web/sites', parameters('gatewayName'))).hostNames[0])]"
-                },
-                "operation": "AddRows(String)",
-                "parameters": {
-                  "datasetId": "[parameters('datasetId')]",
-                  "table": "FreePlayActivities",
-                  "rows": "@string(triggers().outputs.body.freePlayActivities)"
-                },
-                "authentication": {
-                  "type": "Raw",
-                  "scheme": "Zumo",
-                  "parameter": "@parameters('token')"
-                }
-              },
-              "conditions": [  {
-                    "expression": "@not(empty(triggers().outputs.body.freePlayActivities))"
-                }]
-            },
-            "powerbiguided": {
-              "type": "ApiApp",
-              "inputs": {
-                "apiVersion": "2015-01-14",
-                "host": {
-                  "id": "[concat(resourceGroup().id, '/providers/Microsoft.AppService/apiApps/',parameters('PowerBIAPIApp'))]",
-                  "gateway": "[concat('https://', reference(resourceId('Microsoft.Web/sites', parameters('gatewayName'))).hostNames[0])]"
-                },
-                "operation": "AddRows(String)",
-                "parameters": {
-                  "datasetId": "[parameters('datasetId')]",
-                  "table": "GuidedWorkoutActivities",
-                  "rows": "@string(triggers().outputs.body.guidedWorkoutActivities)"
-                },
-                "authentication": {
-                  "type": "Raw",
-                  "scheme": "Zumo",
-                  "parameter": "@parameters('token')"
-                }
-              },
-              "conditions": [  {
-                    "expression": "@not(empty(triggers().outputs.body.guidedWorkoutActivities))"
-                }]
-            },
-            "powerbigolf": {
-              "type": "ApiApp",
-              "inputs": {
-                "apiVersion": "2015-01-14",
-                "host": {
-                  "id": "[concat(resourceGroup().id, '/providers/Microsoft.AppService/apiApps/',parameters('PowerBIAPIApp'))]",
-                  "gateway": "[concat('https://', reference(resourceId('Microsoft.Web/sites', parameters('gatewayName'))).hostNames[0])]"
-                },
-                "operation": "AddRows(String)",
-                "parameters": {
-                  "datasetId": "[parameters('datasetId')]",
-                  "table": "GolfActivities",
-                  "rows": "@string(triggers().outputs.body.golfActivities)"
-                },
-                "authentication": {
-                  "type": "Raw",
-                  "scheme": "Zumo",
-                  "parameter": "@parameters('token')"
-                }
-              },
-              "conditions": [  {
-                    "expression": "@not(empty(triggers().outputs.body.golfActivities))"
-                }]
-            },
-            "powerbisleep": {
-              "type": "ApiApp",
-              "inputs": {
-                "apiVersion": "2015-01-14",
-                "host": {
-                  "id": "[concat(resourceGroup().id, '/providers/Microsoft.AppService/apiApps/',parameters('PowerBIAPIApp'))]",
-                  "gateway": "[concat('https://', reference(resourceId('Microsoft.Web/sites', parameters('gatewayName'))).hostNames[0])]"
-                },
-                "operation": "AddRows(String)",
-                "parameters": {
-                  "datasetId": "[parameters('datasetId')]",
-                  "table": "SleepActivities",
-                  "rows": "@string(triggers().outputs.body.sleepActivities)"
-                },
-                "authentication": {
-                  "type": "Raw",
-                  "scheme": "Zumo",
-                  "parameter": "@parameters('token')"
-                }
-              },
-              "conditions": [  {
-                    "expression": "@not(empty(triggers().outputs.body.sleepActivities))"
-                }]
-            }
           },
           "outputs": {}
         },
