@@ -213,6 +213,20 @@
           "properties": {
             "targetId": "[resourceId('Microsoft.AppService/apiapps', parameters('MSHealthAPIApp'))]"
           }
+        },
+        
+        {
+          "apiVersion": "2015-04-01",
+          "name": "web",
+          "type": "sourcecontrols",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/Sites', parameters('MSHealthAPIApp'))]"
+          ],
+          "properties": {
+            "RepoUrl": "https://github.com/jeffhollan/MSHealthAPI",
+            "branch": "master",
+            "IsManualIntegration": true
+          }
         }
       ],
       "properties": {
@@ -236,6 +250,17 @@
             {
               "name": "WEBSITE_START_SCM_ON_SITE_CREATION",
               "value": "1"
+            },
+            { "name": "siteUrl",
+              "value": "[parameters('MSHealthAPIApp')]" 
+            }
+            ,
+            { "name": "clientId",
+              "value": "4561" 
+            }
+            ,
+            { "name": "clientSecret",
+              "value": "5616" 
             }
           ]
         }
@@ -316,6 +341,19 @@
           "properties": {
             "targetId": "[resourceId('Microsoft.AppService/apiapps', parameters('PowerBIAPIApp'))]"
           }
+        },
+        {
+          "apiVersion": "2015-04-01",
+          "name": "web",
+          "type": "sourcecontrols",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/Sites', parameters('PowerBIAPIApp'))]"
+          ],
+          "properties": {
+            "RepoUrl": "https://github.com/jeffhollan/PowerBIAPI",
+            "branch": "master",
+            "IsManualIntegration": true
+          }
         }
       ],
       "properties": {
@@ -339,6 +377,17 @@
             {
               "name": "WEBSITE_START_SCM_ON_SITE_CREATION",
               "value": "1"
+            },
+            { "name": "siteUrl",
+              "value": "[parameters('PowerBIAPIApp')]" 
+            }
+            ,
+            { "name": "clientId",
+              "value": "4561" 
+            }
+            ,
+            { "name": "clientSecret",
+              "value": "5616" 
             }
           ]
         }
@@ -391,7 +440,8 @@
       },
       "dependsOn": [
         "[resourceId('Microsoft.AppService/apiApps', parameters('MSHealthAPIApp'))]",
-		"[resourceId('Microsoft.AppService/apiApps', parameters('PowerBIAPIApp'))]"
+		    "[resourceId('Microsoft.AppService/apiApps', parameters('PowerBIAPIApp'))]",
+        "[resourceId('Microsoft.Web/sites/sourcecontrols', parameters('MSHealthAPIApp'), 'web')]"
 		
       ],
       "properties": {
