@@ -510,7 +510,7 @@
                 },
                 "operation": "PostTweet",
                 "parameters": {
-                  "TweetText": "I just finished biking with my Band and went @{div(first(triggers().outputs.body.bikeActivities).actualDistance, 160934.4)} miles in @{first(triggers().outputs.body.bikeActivities).duration} minutes!"
+                  "TweetText": "I just finished biking with my Band for @{first(triggers().outputs.body.bikeActivities).duration} minutes and burned @{first(triggers().outputs.body.bikeActivities).totalCalories} calories!"
                 },
                 "authentication": {
                   "type": "Raw",
