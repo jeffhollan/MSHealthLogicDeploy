@@ -24,7 +24,7 @@
     },
     "timezoneOffset": {
       "type": "int",
-      "defaultValue" : 0
+      "defaultValue" : 0,
       "metadata": {
         "description": "Offset for the timezone you want the Microsoft Health data (e.g. `-7` for Pacific Daylight Time)."
       }
