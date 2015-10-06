@@ -468,7 +468,7 @@
                 "operation": "TriggerOnActivity",
                 "parameters": {
                   "triggerState": "@coalesce(triggers()?.outputs?.body?['triggerState'],'')",
-                  "offset" : [parameters('timezoneOffset')]
+                  "offset" : "[parameters('timezoneOffset')]"
                 },
                 "authentication": {
                   "type": "Raw",
@@ -494,7 +494,7 @@
                 },
                 "operation": "PostTweet",
                 "parameters": {
-                  "TweetText": "I just finished a run with my Band and went @{div(first(triggers().outputs.body.runActivities).actualDistance, 160934.4)} miles in @{first(triggers().outputs.body.runActivities).duration} minutes!"
+                  "TweetText": "I just finished a run with my Band and went @{first(triggers().outputs.body.runActivities).actualDistanceMiles} miles in @{first(triggers().outputs.body.runActivities).duration} minutes!"
                 },
                 "authentication": {
                   "type": "Raw",
