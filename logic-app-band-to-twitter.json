@@ -523,7 +523,7 @@
                 "authentication": {
                   "type": "Raw",
                   "scheme": "Zumo",
-                  "parameter": "@parameters('[concat(resourceGroup().id, '/providers/Microsoft.AppService/apiApps/',parameters('TwitterAPIApp'))]')"
+                  "parameter": "@parameters([concat(resourceGroup().id, '/providers/Microsoft.AppService/apiApps/',parameters('TwitterAPIApp'))])"
                 }
               },
               "conditions": [
@@ -547,7 +547,7 @@
                 "authentication": {
                   "type": "Raw",
                   "scheme": "Zumo",
-                  "parameter": "@parameters('[concat(resourceGroup().id, '/providers/Microsoft.AppService/apiApps/',parameters('TwitterAPIApp'))]')"
+                  "parameter": "@parameters('token')"
                 }
               },
               "conditions": [
@@ -571,7 +571,7 @@
                 "authentication": {
                   "type": "Raw",
                   "scheme": "Zumo",
-                  "parameter": "@parameters('[concat(resourceGroup().id, '/providers/Microsoft.AppService/apiApps/',parameters('TwitterAPIApp'))]')"
+                  "parameter": "@parameters('token')"
                 }
               },
               "conditions": [
@@ -595,7 +595,7 @@
                 "authentication": {
                   "type": "Raw",
                   "scheme": "Zumo",
-                  "parameter": "@parameters('[concat(resourceGroup().id, '/providers/Microsoft.AppService/apiApps/',parameters('TwitterAPIApp'))]')"
+                  "parameter": "@parameters('token')"
                 }
               },
               "conditions": [
@@ -619,7 +619,7 @@
                 "authentication": {
                   "type": "Raw",
                   "scheme": "Zumo",
-                  "parameter": "@parameters('[concat(resourceGroup().id, '/providers/Microsoft.AppService/apiApps/',parameters('TwitterAPIApp'))]')"
+                  "parameter": "@parameters('token')"
                 }
               },
               "conditions": [
