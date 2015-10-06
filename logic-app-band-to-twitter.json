@@ -606,7 +606,7 @@
                 },
                 "operation": "PostTweet",
                 "parameters": {
-                  "TweetText": "Just woke up - Band registered @{first(triggers().outputs.body.sleepActivites).sleepDuration} minutes of sleep with @{first(triggers().outputs.body.sleepActivites).sleepEfficiencyPercentage} efficiency."
+                  "TweetText": "Just woke up - Band registered @{first(triggers().outputs.body.sleepActivities).sleepDuration} minutes of sleep with @{first(triggers().outputs.body.sleepActivities).sleepEfficiencyPercentage} efficiency."
                 },
                 "authentication": {
                   "type": "Raw",
@@ -616,7 +616,7 @@
               },
               "conditions": [
                 {
-                  "expression": "@not(empty(triggers().outputs.body.sleepActivites))"
+                  "expression": "@not(empty(triggers().outputs.body.sleepActivities))"
                 }
               ]
             }
