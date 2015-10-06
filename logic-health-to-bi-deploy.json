@@ -22,7 +22,13 @@
         "description": "The name of the gateway. Must be unique."
       }
     },
-    
+     "timezoneOffset": {
+      "type": "int",
+      "defaultValue" : 0,
+      "metadata": {
+        "description": "Offset for the timezone you want the Microsoft Health data (e.g. `-7` for Pacific Daylight Time)."
+      }
+    },
     "MSClientID": {
       "type": "string",
       "metadata": {
@@ -53,6 +59,7 @@
         "description": "Dataset ID for the Power BI Dataset"
       }
     },
+   
     "svcPlanName": {
       "type": "string",
       "metadata": {
@@ -514,7 +521,8 @@
                 },
                 "operation": "TriggerOnDeviceSync",
                 "parameters": {
-                  "triggerState": "@coalesce(triggers()?.outputs?.body?['triggerState'],'')"
+                  "triggerState": "@coalesce(triggers()?.outputs?.body?['triggerState'],'')",
+                  "offset" : "[parameters('timezoneOffset')]"
                 },
                 "authentication": {
                   "type": "Raw",
@@ -604,7 +612,8 @@
                 },
                 "operation": "TriggerOnActivity",
                 "parameters": {
-                  "triggerState": "@coalesce(triggers()?.outputs?.body?['triggerState'],'')"
+                  "triggerState": "@coalesce(triggers()?.outputs?.body?['triggerState'],'')",
+                  "offset" : "[parameters('timezoneOffset')]"
                 },
                 "authentication": {
                   "type": "Raw",
