@@ -523,7 +523,7 @@
                 "authentication": {
                   "type": "Raw",
                   "scheme": "Zumo",
-                  "parameter": "[concat(resourceGroup().id, '/providers/Microsoft.AppService/apiApps/',parameters('TwitterAPIApp'))]"
+                  "parameter": "@parameters('token')"
                 }
               },
               "conditions": [
